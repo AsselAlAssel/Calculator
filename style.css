@@ -1,10 +1,22 @@
+:root {
+    --background-color-container: #fff;
+    --color-showEquation: rgb(133, 127, 127);
+    --color-showResult: #000;
+    --background-color-themContainer: #f9f9f9;
+    --color-sunBtn: #3e4249;
+    --corl-moonBtn: #b8b8b8;
+    --background-color-btnsContainer: #f9f9f9;
+    --background-color-btn: #f7f7f7;
+    --color-numberBtn: #000;
+}
+
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
 }
 
-* {
-    box-sizing: border-box;
+html {
+    font-size: 18px;
 }
 
 .container {
@@ -14,56 +26,52 @@ body {
     border: 0.5px solid black;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    background-color: var(--background-color-container);
 }
 
-.container .shows-container {
+.container__shows-container {
     text-align: right;
     flex-basis: 30%;
     padding: 10px;
+    background-color: var(--background-color-container);
 }
 
-.container .btns-container {
-    flex: 1;
-}
-
-.container .dark-button {
+.container__theme-btns-container {
     margin: 0 auto;
     width: 120px;
-    background-color: #f9f9f9;
+    background-color: var(--background-color-themContainer);
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 20px;
+    font-size: 1rem;
     overflow: hidden;
 }
 
-.container .dark-button>button {
+.container__theme-btns-container>.btn {
     display: block;
     padding: 10px;
-    font-size: 25px;
+    font-size: 1.5rem;
     width: 50%;
     text-align: center;
     cursor: pointer;
     transition: 0.4s ease-in-out;
-    color: #b8b8b8;
     border: none;
     background-color: transparent;
 }
 
-.container .dark-button .sun {
-    color: #3e4249;
-    pointer-events: none;
+.container__theme-btns-container .btn--sun {
+    color: var(--color-sunBtn);
 }
 
-.container .dark-button .moon {
-    color: #fff;
-    pointer-events: none;
+.container__theme-btns-container .btn--moon {
+    color: var(--corl-moonBtn);
 }
 
-.container .shows-container .show-equation {
-    font-size: 15px;
-    color: rgb(133, 127, 127);
+.container__show-equation {
+    font-size: .8rem;
+    color: var(--color-showEquation);
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
@@ -71,36 +79,46 @@ body {
     margin-bottom: 10px;
 }
 
-.container .shows-container .show-result {
-    font-size: 40px;
+.container__show-result {
+    font-size: 2rem;
     padding: 10px;
+    color: var(--color-showResult);
 }
 
-.container .btns-container {
+.container__btns-container {
+    flex: 1;
+    box-sizing: border-box;
+}
+
+.container__btns-container {
     cursor: pointer;
     width: 100%;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: var(--background-color-btnsContainer);
     border-radius: 20px 20px 0px 0px;
 }
 
-.container .btns-container .btn {
+.container__btns-container .btn {
     padding: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 30px;
+    font-size: 1.6rem;
     border: none;
     border-radius: 20px;
-    background-color: #f7f7f7;
+    background-color: var(--background-color-btn);
     position: relative;
     overflow: hidden;
 }
 
-.container .btns-container .btn::before {
+.container__btns-container .btn.number {
+    color: var(--color-numberBtn);
+}
+
+.container__btns-container .btn::before {
     position: absolute;
     content: "";
     width: 0px;
@@ -110,17 +128,18 @@ body {
     z-index: 0;
 }
 
-.container .btns-container .btn:hover::before {
+.container__btns-container .btn:hover::before {
     height: 100%;
     width: 100%;
 }
 
-.clear-all,
-.clear {
-    color: #86fadf;
+.clean-all,
+.clean {
+    color: #86fadf !important;
 }
 
-.container .btns-container .operation {
+.container__btns-container .operation,
+.container__btns-container .clean-step {
     color: #e96666;
 }
 
@@ -130,32 +149,7 @@ body {
         min-height: auto;
         margin-top: 10px;
     }
-    .container .btns-container .btn {
+    .container__btns-container .btn {
         cursor: pointer;
     }
-}
-
-
-/* for dark */
-
-.container.dark {
-    background-color: #22252d !important;
-}
-
-.dark-button.dark,
-.btns-container.dark {
-    background-color: #292d36 !important;
-}
-
-.show-equation.dark,
-.show-result.dark {
-    color: #fff !important;
-}
-
-.btns-container.dark .btn.dark {
-    background-color: #272b33 !important;
-}
-
-.btns-container.dark .number {
-    color: #fff;
 }
