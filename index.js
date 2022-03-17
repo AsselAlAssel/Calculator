@@ -1,4 +1,4 @@
-const root = document.querySelector(":root"),
+let root = document.querySelector(":root"),
     body = document.querySelector("body"),
     sunBtn = document.querySelector(".sun"),
     moonBtn = document.querySelector(".moon"),
@@ -27,11 +27,11 @@ const doTheTheme = (vaiable, value, root) => root.style.setProperty(vaiable, val
 const toggleTheme = (root, body, cssVariables, darkThemeColor, ligthThemeColor) => {
 
     if (!(body.dataset.theme)) {
-        cssVariables.forEach((ele, index) => doTheTheme(ele, darkThemeColor[index],root))
+        cssVariables.forEach((ele, index) => doTheTheme(ele, darkThemeColor[index], root))
 
         body.dataset.theme = "dark";
     } else {
-        cssVariables.forEach((ele, index) => doTheTheme(ele, ligthThemeColor[index],root))
+        cssVariables.forEach((ele, index) => doTheTheme(ele, ligthThemeColor[index], root))
         delete body.dataset.theme;
     }
 
