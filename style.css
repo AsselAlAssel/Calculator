@@ -10,6 +10,17 @@
     --color-numberBtn: #000;
 }
 
+.dark-them {
+    --background-color-container: #22252d;
+    --color-showEquation: #fff;
+    --color-showResult: #fff;
+    --background-color-themContainer: #292d36;
+    --corl-moonBtn: #fff;
+    --background-color-btnsContainer: #292d36;
+    --background-color-btn: #272b33;
+    --color-numberBtn: #fff;
+}
+
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
