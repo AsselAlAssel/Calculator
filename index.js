@@ -1,4 +1,4 @@
-const domElement = {
+const domElements = {
     body: document.querySelector("body"),
     container: document.getElementsByClassName("container"),
     themeContainer: document.querySelector(".container__theme-btns-container"),
@@ -9,10 +9,10 @@ const domElement = {
     btnsContainer: document.querySelector(".container__btns-container"),
     btn: document.querySelectorAll(".container__btns-container .btn")
 }
-const toggleTheme = () => domElement.body.classList.toggle("dark-them")
+const toggleTheme = () => domElements.body.classList.toggle("dark-them")
 
-domElement.sunBtn.addEventListener("click", () => toggleTheme());
-domElement.moonBtn.addEventListener("click", () => toggleTheme());
+domElements.sunBtn.addEventListener("click", () => toggleTheme());
+domElements.moonBtn.addEventListener("click", () => toggleTheme());
 
 // *************************
 const initialState = {
@@ -21,138 +21,146 @@ const initialState = {
     secondVal: "",
     operation: "",
 }
-
 Object.freeze(initialState);
 let state = { ...initialState };
-const setState = (state, value) => { return { ...state, ...value } };
+// const setState = (state, value) => { return { ...state, ...value } };
+
+const setState = (value) => {
+    state = { ...state, ...value };
+};
 // **********************************
 
 const showContent = (content, container) => container.innerText = content;
 
 const hasZeroLen = (value) => value.length === 0;
 
-const cleanState = (state, initialState) => {
-    showContent("0", domElement.equationContainer);
-    showContent("0", domElement.resultContainer);
-    return setState(state, initialState);
+const resetState = (initialState) => {
+    showContent("0", domElements.equationContainer);
+    showContent("0", domElements.resultContainer);
+    setState(initialState);
 }
 
-const cleanInput = (state, property) => {
-    showContent("0", domElement.resultContainer);
-    return setState(state, { [`${property}`]: "" });
+const cleanInput = (property) => {
+    showContent("0", domElements.resultContainer);
+    setState({ [`${property}`]: "" });
 }
-const deleteStep = (state, property) => {
-    state = setState(state, { [`${property}`]: state[`${property}`].slice(0, state[`${property}`].length - 1) });
-    showContent(state[`${property}`] || "0", domElement.resultContainer);
-    return state;
+const deleteStep = (property) => {
+    setState({ [`${property}`]: state[`${property}`].slice(0, state[`${property}`].length - 1) });
+    showContent(state[`${property}`] || "0", domElements.resultContainer);
 }
-const toggleSign = (state, property) => {
-    state = setState(state, { [`${property}`]: +(state[`${property}`]) * -1 + "" });
-    showContent(state[`${property}`], domElement.resultContainer);
-    return state;
-}
+const toggleSign = (property) => {
+    setState({ [`${property}`]: +(state[`${property}`]) * -1 + "" });
+    showContent(state[`${property}`], domElements.resultContainer);
 
-const addNumberToState = (state, prevValue, valueEntered, property) => {
+}
+const addNumberToState = (prevValue, valueEntered, property) => {
     if (valueEntered === "." && prevValue.includes(".")) {
-        return state;
+        return;
     }
-    showContent(prevValue + valueEntered, domElement.resultContainer);
-    return setState(state, { [`${property}`]: prevValue + valueEntered });
+    setState({ [`${property}`]: prevValue + valueEntered });
+    showContent(state[`${property}`], domElements.resultContainer);
 }
-const numberClicked = (targeted, state) => {
+const numberClicked = (targeted) => {
     let valueEntered = targeted.dataset.value;
-    return hasZeroLen(state.operation) ? addNumberToState(state, state.firstVal, valueEntered, "firstVal") :
-        addNumberToState(state, state.secondVal, valueEntered, "secondVal");
+    hasZeroLen(state.operation) ? addNumberToState(state.firstVal, valueEntered, "firstVal") :
+        addNumberToState(state.secondVal, valueEntered, "secondVal");
 
 }
 const sum = (firstVal, secondVal) => firstVal + secondVal;
 const minus = (firstVal, secondVal) => firstVal - secondVal;
 const multiply = (firstVal, secondVal) => firstVal * secondVal;
-const divide = (firstVal, secondVal) => { return secondVal !== 0 ? firstVal / secondVal : NaN };
+const divide = (firstVal, secondVal) => secondVal !== 0 ? firstVal / secondVal : NaN;
 
-const doTheEquationByCallback = (state, callback) => {
+const doTheEquationByCallback = (callback) => {
     let resFromEquation = callback(+state.firstVal, +state.secondVal);
     if (isNaN(resFromEquation)) {
-        return setState(state, { res: "wrong input", firstVal: "", secondVal: "", operation: "" });
+        setState({ res: "wrong input", firstVal: "", secondVal: "", operation: "" });
     } else if (resFromEquation > 99999999.99) {
-        return setState(state, { res: "the result than 10 digit ", firstVal: "", secondVal: "", operation: "" });
+        setState({ res: "the result than 10 digit ", firstVal: "", secondVal: "", operation: "" });
     } else {
         if (resFromEquation - parseInt(resFromEquation) > 0) {
             resFromEquation = resFromEquation.toFixed(2);
         }
-        return setState(state, { res: resFromEquation, firstVal: resFromEquation, secondVal: "", operation: "" });
+        setState({ res: resFromEquation, firstVal: resFromEquation, secondVal: "", operation: "" });
     }
-
-
 }
-const doTheEquation = (state) => {
+const doTheEquation = () => {
     switch (state.operation) {
         case "+":
-            return doTheEquationByCallback(state, sum);
+            doTheEquationByCallback(sum);
+            break;
         case "-":
-            return doTheEquationByCallback(state, minus);
+            doTheEquationByCallback(minus);
+            break;
         case "*":
-            return doTheEquationByCallback(state, multiply);
+            doTheEquationByCallback(multiply);
+            break;
         case "/":
-            return doTheEquationByCallback(state, divide);
+            doTheEquationByCallback(divide);
+            break;
     }
 }
-const operationMathClicked = (state, operationValue) => {
+const operationMathClicked = (operationValue) => {
     if (hasZeroLen(state.operation) && operationValue !== "=") {
-        showContent(`${state.firstVal} ${operationValue}`, domElement.equationContainer);
-        showContent("0", domElement.resultContainer);
-        return setState(state, { operation: operationValue });
+        showContent(`${state.firstVal} ${operationValue}`, domElements.equationContainer);
+        showContent("0", domElements.resultContainer);
+        setState({ operation: operationValue });
     } else {
         if (hasZeroLen(state.secondVal) && operationValue === "=") {
-            return state;
+            return;
         }
         else if (hasZeroLen(state.secondVal) && operationValue !== "=") {
-            showContent(`${state.firstVal} ${operationValue}`, domElement.equationContainer);
-            return setState(state, { operation: operationValue });
+            showContent(`${state.firstVal} ${operationValue}`, domElements.equationContainer);
+            setState({ operation: operationValue });
         } else {
-            state = doTheEquation(state);
+            doTheEquation();
             if (operationValue === "=") {
-                showContent("0", domElement.equationContainer);
-                showContent(state.res, domElement.resultContainer);
-                return state;
+                showContent("0", domElements.equationContainer);
+                showContent(state.res, domElements.resultContainer);
             } else {
-                showContent(`${state.res} ${operationValue}`, domElement.equationContainer);
-                showContent("0", domElement.resultContainer);
-                return setState(state, { operation: operationValue });
+                showContent(`${state.res} ${operationValue}`, domElements.equationContainer);
+                showContent("0", domElements.resultContainer);
+                setState({ operation: operationValue });
             }
         }
     }
 }
-const operationClicked = (targeted, state) => {
+const operationClicked = (targeted) => {
     if (hasZeroLen(state.firstVal) && targeted.dataset.value !== "CA") {
-        return state;
+        return;
     }
     let operationValue = targeted.dataset.value;
     switch (operationValue) {
         case "CA":
-            return cleanState(state, initialState);
+            resetState(initialState);
+            break;
         case "C":
-            return hasZeroLen(state.operation) ? cleanInput(state, "firstVal") : cleanInput(state, "secondVal");
+            hasZeroLen(state.operation) ? cleanInput("firstVal") : cleanInput("secondVal");
+            break;
         case "delete-step":
-            return hasZeroLen(state.operation) ? deleteStep(state, "firstVal") : deleteStep(state, "secondVal");
+            hasZeroLen(state.operation) ? deleteStep("firstVal") : deleteStep("secondVal");
+            break;
         case "+/-":
-            return hasZeroLen(state.operation) ? toggleSign(state, "firstVal") : toggleSign(state, "secondVal");
+            hasZeroLen(state.operation) ? toggleSign("firstVal") : toggleSign("secondVal");
+            break;
         default:
-            return operationMathClicked(state, operationValue);
+            operationMathClicked(operationValue);
+            break;
     }
 }
-const whatBtnClicked = (targeted, state) => {
+const whatBtnClicked = (targeted) => {
     let type = targeted.dataset.type;
     switch (type) {
         case "operation":
-            return operationClicked(targeted, state);
+            operationClicked(targeted);
+            break;
         case "number":
-            return numberClicked(targeted, state);
+            numberClicked(targeted);
+            break;
     }
 }
 const btnClicked = (targeted, state) => targeted.tagName === "BUTTON" ? whatBtnClicked(targeted, state) : state;
-
-domElement.btnsContainer.addEventListener("click", (event) => state = btnClicked(event.target, state));
+domElements.btnsContainer.addEventListener("click", (event) => btnClicked(event.target, state));
 
 
 
