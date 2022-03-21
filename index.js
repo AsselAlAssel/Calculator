@@ -73,7 +73,7 @@ const divide = (firstVal, secondVal) => { return secondVal !== 0 ? firstVal / se
 const doTheEquationByCallback = (state, callback) => {
     let resFromEquation = callback(+state.firstVal, +state.secondVal);
     if (isNaN(resFromEquation)) {
-        return setState(state, { res: "cant divide by 0", firstVal: "", secondVal: "", operation: "" });
+        return setState(state, { res: "wrong input", firstVal: "", secondVal: "", operation: "" });
     } else if (resFromEquation > 99999999.99) {
         return setState(state, { res: "the result than 10 digit ", firstVal: "", secondVal: "", operation: "" });
     } else {
