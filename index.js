@@ -23,128 +23,128 @@ const initialState = {
 }
 Object.freeze(initialState);
 let state = { ...initialState };
-// const setState = (state, value) => { return { ...state, ...value } };
-
-const setState = (value) => {
-    state = { ...state, ...value };
-};
-// **********************************
-
-const showContent = (content, container) => container.innerText = content;
 
 const hasZeroLen = (value) => value.length === 0;
+const showContent = (content, container) => container.innerText = content;
+
+const reMount = () => {
+    let equation = hasZeroLen(state.operation) ? "0" : state.firstVal + state.operation;
+    showContent(equation, domElements.equationContainer);
+    showContent(state.res || "0", domElements.resultContainer);
+}
+const setState = (value) => {
+    state = { ...state, ...value };
+    console.log(state);
+    reMount();
+};
 
 const resetState = (initialState) => {
-    showContent("0", domElements.equationContainer);
-    showContent("0", domElements.resultContainer);
     setState(initialState);
 }
+const resetInput = () => {
+    setState({ res: "" });
+}
+const deleteStep = () => {
+    setState({ res: state.res.slice(0, state.res.length - 1) });
+}
+const toggleSign = () => {
+    setState({ res: (+state.res) * -1 + "" });
+}
 
-const cleanInput = (property) => {
-    showContent("0", domElements.resultContainer);
-    setState({ [`${property}`]: "" });
-}
-const deleteStep = (property) => {
-    setState({ [`${property}`]: state[`${property}`].slice(0, state[`${property}`].length - 1) });
-    showContent(state[`${property}`] || "0", domElements.resultContainer);
-}
-const toggleSign = (property) => {
-    setState({ [`${property}`]: +(state[`${property}`]) * -1 + "" });
-    showContent(state[`${property}`], domElements.resultContainer);
-
-}
-const addNumberToState = (prevValue, valueEntered, property) => {
-    if (valueEntered === "." && prevValue.includes(".")) {
+const numberClicked = (targeted) => {
+    let numberPressed = targeted.dataset.value,
+        prevValue = state.res;
+    if (numberPressed === "." && prevValue.includes(".")) {
         return;
     }
-    setState({ [`${property}`]: prevValue + valueEntered });
-    showContent(state[`${property}`], domElements.resultContainer);
-}
-const numberClicked = (targeted) => {
-    let valueEntered = targeted.dataset.value;
-    hasZeroLen(state.operation) ? addNumberToState(state.firstVal, valueEntered, "firstVal") :
-        addNumberToState(state.secondVal, valueEntered, "secondVal");
-
+    setState({ res: prevValue + numberPressed });
 }
 const sum = (firstVal, secondVal) => firstVal + secondVal;
 const minus = (firstVal, secondVal) => firstVal - secondVal;
 const multiply = (firstVal, secondVal) => firstVal * secondVal;
 const divide = (firstVal, secondVal) => secondVal !== 0 ? firstVal / secondVal : NaN;
 
-const doTheEquationByCallback = (callback) => {
+const solveTheEquationByCallback = (callback) => {
     let resFromEquation = callback(+state.firstVal, +state.secondVal);
     if (isNaN(resFromEquation)) {
-        setState({ res: "wrong input", firstVal: "", secondVal: "", operation: "" });
-    } else if (resFromEquation > 99999999.99) {
-        setState({ res: "the result than 10 digit ", firstVal: "", secondVal: "", operation: "" });
-    } else {
-        if (resFromEquation - parseInt(resFromEquation) > 0) {
-            resFromEquation = resFromEquation.toFixed(2);
-        }
-        setState({ res: resFromEquation, firstVal: resFromEquation, secondVal: "", operation: "" });
-    }
-}
-const doTheEquation = () => {
-    switch (state.operation) {
-        case "+":
-            doTheEquationByCallback(sum);
-            break;
-        case "-":
-            doTheEquationByCallback(minus);
-            break;
-        case "*":
-            doTheEquationByCallback(multiply);
-            break;
-        case "/":
-            doTheEquationByCallback(divide);
-            break;
-    }
-}
-const operationMathClicked = (operationValue) => {
-    if (hasZeroLen(state.operation) && operationValue !== "=") {
-        showContent(`${state.firstVal} ${operationValue}`, domElements.equationContainer);
-        showContent("0", domElements.resultContainer);
-        setState({ operation: operationValue });
-    } else {
-        if (hasZeroLen(state.secondVal) && operationValue === "=") {
-            return;
-        }
-        else if (hasZeroLen(state.secondVal) && operationValue !== "=") {
-            showContent(`${state.firstVal} ${operationValue}`, domElements.equationContainer);
-            setState({ operation: operationValue });
-        } else {
-            doTheEquation();
-            if (operationValue === "=") {
-                showContent("0", domElements.equationContainer);
-                showContent(state.res, domElements.resultContainer);
-            } else {
-                showContent(`${state.res} ${operationValue}`, domElements.equationContainer);
-                showContent("0", domElements.resultContainer);
-                setState({ operation: operationValue });
-            }
-        }
-    }
-}
-const operationClicked = (targeted) => {
-    if (hasZeroLen(state.firstVal) && targeted.dataset.value !== "CA") {
+        setState({ res: "", firstVal: "", secondVal: "", operation: "" });
+        showContent("wrong input",domElements.resultContainer);
         return;
     }
-    let operationValue = targeted.dataset.value;
-    switch (operationValue) {
+    if (resFromEquation > 99999999.99) {
+        setState({ res: "", firstVal: "", secondVal: "", operation: "" });
+        showContent("more than 10 digit",domElements.resultContainer);
+        return;
+
+    }
+    if (resFromEquation - parseInt(resFromEquation) > 0) {
+        resFromEquation = resFromEquation.toFixed(2);
+        return;
+    }
+    setState({ res: resFromEquation, firstVal: resFromEquation, secondVal: "", operation: "" });
+}
+
+const solveTheEquation = () => {
+    switch (state.operation) {
+        case "+":
+            solveTheEquationByCallback(sum);
+            break;
+        case "-":
+            solveTheEquationByCallback(minus);
+            break;
+        case "*":
+            solveTheEquationByCallback(multiply);
+            break;
+        case "/":
+            solveTheEquationByCallback(divide);
+            break;
+    }
+}
+
+const operationMathClicked = (operationTextValue) => {
+    let pressedMthOperationWithFirstValue = !hasZeroLen(state.firstVal) && operationTextValue !== "=",
+        pressedMathOperationWithJustFirstValue = !hasZeroLen(state.firstVal) && hasZeroLen(state.res) && operationTextValue !== "=",
+        pressedEqual = operationTextValue === "=";
+    if (pressedMthOperationWithFirstValue) {
+        setState({ operation: operationTextValue });
+        return;
+    }
+    if (!pressedEqual) {
+        setState({ res: "", firstVal: state.res, operation: operationTextValue });
+        return;
+    }
+    if (pressedEqual) {
+        setState({ secondVal: state.res });
+        solveTheEquation();
+        return;
+    }
+    setState({ secondVal: state.res });
+    solveTheEquation();
+    setState({ res: "", operation: operationTextValue });
+}
+
+const operationClicked = (targeted) => {
+    let preventOperationBeforeEnterAnyValue = hasZeroLen(state.res) && hasZeroLen(state.firstVal) && targeted.dataset.value !== "CA";
+
+    if (preventOperationBeforeEnterAnyValue) {
+        return;
+    }
+    let operationTextValue = targeted.dataset.value;
+    switch (operationTextValue) {
         case "CA":
             resetState(initialState);
             break;
         case "C":
-            hasZeroLen(state.operation) ? cleanInput("firstVal") : cleanInput("secondVal");
+            resetInput();
             break;
         case "delete-step":
-            hasZeroLen(state.operation) ? deleteStep("firstVal") : deleteStep("secondVal");
+            deleteStep();
             break;
         case "+/-":
-            hasZeroLen(state.operation) ? toggleSign("firstVal") : toggleSign("secondVal");
+            toggleSign()
             break;
         default:
-            operationMathClicked(operationValue);
+            operationMathClicked(operationTextValue);
             break;
     }
 }
