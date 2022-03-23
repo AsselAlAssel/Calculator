@@ -102,10 +102,9 @@ const solveTheEquation = () => {
 }
 
 const operationMathClicked = (operationTextValue) => {
-    let pressedMthOperationWithFirstValue = !hasZeroLen(state.firstVal) && operationTextValue !== "=",
-        pressedMathOperationWithJustFirstValue = !hasZeroLen(state.firstVal) && hasZeroLen(state.res) && operationTextValue !== "=",
+    let pressMathOperationWithFirstValue = !hasZeroLen(state.firstVal) && operationTextValue !== "=",
         pressedEqual = operationTextValue === "=";
-    if (pressedMthOperationWithFirstValue) {
+    if (pressMathOperationWithFirstValue) {
         setState({ operation: operationTextValue });
         return;
     }
@@ -125,7 +124,6 @@ const operationMathClicked = (operationTextValue) => {
 
 const operationClicked = (targeted) => {
     let preventOperationBeforeEnterAnyValue = hasZeroLen(state.res) && hasZeroLen(state.firstVal) && targeted.dataset.value !== "CA";
-
     if (preventOperationBeforeEnterAnyValue) {
         return;
     }
