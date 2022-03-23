@@ -8,173 +8,163 @@ const domElements = {
     resultContainer: document.querySelector(".container__show-result"),
     btnsContainer: document.querySelector(".container__btns-container"),
     btn: document.querySelectorAll(".container__btns-container .btn")
-}
-const toggleTheme = () => domElements.body.classList.toggle("dark-them")
-
+};
+const toggleTheme = () => domElements.body.classList.toggle("dark-them");
 domElements.sunBtn.addEventListener("click", () => toggleTheme());
 domElements.moonBtn.addEventListener("click", () => toggleTheme());
 
 // *************************
+
 const initialState = {
-    res: "",
     firstVal: "",
     secondVal: "",
     operation: "",
 }
 Object.freeze(initialState);
 let state = { ...initialState };
-
 const hasZeroLen = (value) => value.length === 0;
 const showContent = (content, container) => container.innerText = content;
-
 const reMount = () => {
-    let equation = hasZeroLen(state.operation) ? "0" : state.firstVal + state.operation;
+    const equation = hasZeroLen(state.operation) ? "0" : state.firstVal + state.operation;
+    const res = hasZeroLen(state.operation) ? state.firstVal : state.secondVal;
     showContent(equation, domElements.equationContainer);
-    showContent(state.res || "0", domElements.resultContainer);
+    showContent(res || "0", domElements.resultContainer);
 }
 const setState = (value) => {
     state = { ...state, ...value };
     console.log(state);
     reMount();
 };
-
 const resetState = () => {
     setState(initialState);
 }
-const resetInput = () => {
-    setState({ res: "" });
+const resetFirstValue = () => {
+    setState({ firstVal: "" });
 }
-const deleteStep = () => {
-    setState({ res: state.res.slice(0, state.res.length - 1) });
+const resetSecondValue = () => {
+    setState({ secondVal: "" });
 }
-const toggleSign = () => {
-    setState({ res: (+state.res) * -1 + "" });
+const deleteStepFirstValue = () => {
+    setState({ firstVal: state.firstVal.slice(0, state.firstVal.length - 1) });
 }
+const deleteStepSecondValue = () => {
+    setState({ secondVal: state.secondVal.slice(0, state.secondVal.length - 1) });
+}
+const toggleSignFirstValue = () => {
+    setState({ firstVal: (+state.firstVal) * -1 + "" });
+}
+const toggleSignSecondValue = () => {
+    setState({ secondVal: (+state.secondVal) * -1 + "" });
+}
+const hasDot = (value, numberPressed) => numberPressed === "." && value.includes(".");
+const isLengthLessThan13 = (value) => value.length < 13;
 
-const numberClicked = (targeted) => {
-    let numberPressed = targeted.dataset.value,
-        prevValue = state.res;
-    if (numberPressed === "." && prevValue.includes(".")) {
+const addToFirstValue = (numberPressed) => {
+    if (hasDot(state.firstVal, numberPressed)) {
         return;
     }
-    setState({ res: prevValue + numberPressed });
+    const newFirstValue = state.firstVal + numberPressed;
+    if (isLengthLessThan13(newFirstValue)) {
+        setState({ firstVal: newFirstValue });
+    }
+}
+const addToSecondValue = (numberPressed) => {
+    if (hasDot(state.secondVal, numberPressed)) {
+        return;
+    }
+    const newSecondValue = state.secondVal + numberPressed;
+    if (isLengthLessThan13(newSecondValue)) {
+        setState({ secondVal: newSecondValue });
+    }
+}
+const findClickedNumber = (targeted) => {
+    const numberPressed = targeted.dataset.value;
+    if (hasZeroLen(state.operation)) {
+        addToFirstValue(numberPressed);
+        return;
+    }
+    addToSecondValue(numberPressed);
 }
 const sum = (firstVal, secondVal) => firstVal + secondVal;
 const minus = (firstVal, secondVal) => firstVal - secondVal;
 const multiply = (firstVal, secondVal) => firstVal * secondVal;
 const divide = (firstVal, secondVal) => secondVal !== 0 ? firstVal / secondVal : NaN;
-
 const solveTheEquationByCallback = (callback) => {
+
     let resFromEquation = callback(+state.firstVal, +state.secondVal);
     if (isNaN(resFromEquation)) {
         resetState();
-        showContent("wrong input", domElements.resultContainer);
+        showContent("cant divide by 0", domElements.resultContainer);
         return;
     }
-    if (resFromEquation > 99999999.99) {
-        resetState();
-        showContent("more than 10 digit", domElements.resultContainer);
-        return;
-
-    }
-    if (Math.abs(resFromEquation) - parseInt(Math.abs(resFromEquation)) > 0) {
+    if ((resFromEquation + "").includes(".")) {
         resFromEquation = resFromEquation.toFixed(2);
-
     }
-    setState({ res: resFromEquation, firstVal: "", secondVal: "", operation: "" });
+    setState({ firstVal: resFromEquation, secondVal: "", operation: "" });
 }
-
 const solveTheEquation = () => {
     switch (state.operation) {
         case "+":
-            solveTheEquationByCallback(sum);
-            break;
+            return solveTheEquationByCallback(sum);
+
         case "-":
-            solveTheEquationByCallback(minus);
-            break;
+            return solveTheEquationByCallback(minus);
+
         case "*":
-            solveTheEquationByCallback(multiply);
-            break;
+            return solveTheEquationByCallback(multiply);
+
         case "/":
-            solveTheEquationByCallback(divide);
-            break;
+            return solveTheEquationByCallback(divide);
     }
 }
-
-const operationMathClicked = (operationTextValue) => {
-    let pressEqualWithNoSecondValue = (!hasZeroLen(state.firstVal)
-        && hasZeroLen(state.res) &&
-        operationTextValue === "="),
-        pressMathOperationWithNoFirstValue = (hasZeroLen(state.firstVal)
-            && operationTextValue !== "="),
-        pressMathOperationWithNoSecondValue = (hasZeroLen(state.res)
-            && !hasZeroLen(state.firstVal) &&
-            operationTextValue !== "="),
-        pressEqualWithSecondValue = (!hasZeroLen(state.res)
-            && !hasZeroLen(state.firstVal) &&
-            operationTextValue === "=");
-
-    if (pressMathOperationWithNoFirstValue) {
-        setState({ res: "", firstVal: state.res, operation: operationTextValue });
-        return;
-    }
-    if (pressEqualWithNoSecondValue) {
-        return;
-    }
-    if (pressMathOperationWithNoSecondValue) {
-        console.log(2);
+const findOperationMathClicked = (operationTextValue) => {
+    const pressOperationWithNoSecondValue = hasZeroLen(state.secondVal) && operationTextValue !== "=";
+    const pressEqualWithSecondValue = !hasZeroLen(state.secondVal) && operationTextValue === "=";
+    if (pressOperationWithNoSecondValue) {
         setState({ operation: operationTextValue });
         return;
     }
     if (pressEqualWithSecondValue) {
-        console.log(3);
-        setState({ secondVal: state.res });
         solveTheEquation();
         return;
     }
-
-    console.log(4);
-    setState({ secondVal: state.res });
     solveTheEquation();
-    setState({ res: "", firstVal: state.res, operation: operationTextValue });
+    if (!hasZeroLen(state.firstVal)) {
+        console.log(4);
+        setState({ operation: operationTextValue });
+    }
 }
 
-const operationClicked = (targeted) => {
-    let preventOperationBeforeEnterAnyValue = (hasZeroLen(state.res) &&
-        hasZeroLen(state.firstVal) &&
-        targeted.dataset.value !== "CA");
 
-    if (preventOperationBeforeEnterAnyValue) {
+const findClickedOperation = (targeted) => {
+    const operationTextValue = targeted.dataset.value;
+// Ca
+// عشان اذا طبع ايرور يقدر يكبس على الكبسه يفضي كلشي بالشاشه او بامكانه يكبس عرقم ههههههه 
+    if (hasZeroLen(state.firstVal) && operationTextValue !== "CA") {
         return;
     }
-    let operationTextValue = targeted.dataset.value;
+    const DoseOperationEmpty = hasZeroLen(state.operation);
     switch (operationTextValue) {
         case "CA":
-            resetState();
-            break;
+            return resetState();
         case "C":
-            resetInput();
-            break;
+            return DoseOperationEmpty ? resetFirstValue() : resetSecondValue();
         case "delete-step":
-            deleteStep();
-            break;
+            return DoseOperationEmpty ? deleteStepFirstValue() : deleteStepSecondValue();
         case "+/-":
-            toggleSign()
-            break;
+            return DoseOperationEmpty ? toggleSignFirstValue() : toggleSignSecondValue();
         default:
-            operationMathClicked(operationTextValue);
-            break;
+            return findOperationMathClicked(operationTextValue);
+
     }
 }
 const whatBtnClicked = (targeted) => {
     let type = targeted.dataset.type;
     switch (type) {
         case "operation":
-            operationClicked(targeted);
-            break;
+            return findClickedOperation(targeted);
         case "number":
-            numberClicked(targeted);
-            break;
+            return findClickedNumber(targeted);
     }
 }
 const btnClicked = (targeted, state) => targeted.tagName === "BUTTON" ? whatBtnClicked(targeted, state) : state;
