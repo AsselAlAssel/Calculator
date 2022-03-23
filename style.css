@@ -91,7 +91,7 @@ html {
 }
 
 .container__show-result {
-    font-size: 2rem;
+    font-size: 1.7rem;
     padding: 10px;
     color: var(--color-showResult);
 }
@@ -156,7 +156,7 @@ html {
 
 @media (min-width: 768px) {
     .container {
-        max-width: 350px;
+        max-width: 380px;
         min-height: auto;
         margin-top: 10px;
     }
