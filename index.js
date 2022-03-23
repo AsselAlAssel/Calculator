@@ -38,7 +38,7 @@ const setState = (value) => {
     reMount();
 };
 
-const resetState = (initialState) => {
+const resetState = () => {
     setState(initialState);
 }
 const resetInput = () => {
@@ -67,21 +67,21 @@ const divide = (firstVal, secondVal) => secondVal !== 0 ? firstVal / secondVal :
 const solveTheEquationByCallback = (callback) => {
     let resFromEquation = callback(+state.firstVal, +state.secondVal);
     if (isNaN(resFromEquation)) {
-        setState({ res: "", firstVal: "", secondVal: "", operation: "" });
-        showContent("wrong input",domElements.resultContainer);
+        resetState();
+        showContent("wrong input", domElements.resultContainer);
         return;
     }
     if (resFromEquation > 99999999.99) {
-        setState({ res: "", firstVal: "", secondVal: "", operation: "" });
-        showContent("more than 10 digit",domElements.resultContainer);
+        resetState();
+        showContent("more than 10 digit", domElements.resultContainer);
         return;
 
     }
-    if (resFromEquation - parseInt(resFromEquation) > 0) {
+    if (Math.abs(resFromEquation) - parseInt(Math.abs(resFromEquation)) > 0) {
         resFromEquation = resFromEquation.toFixed(2);
-        return;
+
     }
-    setState({ res: resFromEquation, firstVal: resFromEquation, secondVal: "", operation: "" });
+    setState({ res: resFromEquation, firstVal: "", secondVal: "", operation: "" });
 }
 
 const solveTheEquation = () => {
@@ -102,35 +102,55 @@ const solveTheEquation = () => {
 }
 
 const operationMathClicked = (operationTextValue) => {
-    let pressMathOperationWithFirstValue = !hasZeroLen(state.firstVal) && operationTextValue !== "=",
-        pressedEqual = operationTextValue === "=";
-    if (pressMathOperationWithFirstValue) {
-        setState({ operation: operationTextValue });
-        return;
-    }
-    if (!pressedEqual) {
+    let pressEqualWithNoSecondValue = (!hasZeroLen(state.firstVal)
+        && hasZeroLen(state.res) &&
+        operationTextValue === "="),
+        pressMathOperationWithNoFirstValue = (hasZeroLen(state.firstVal)
+            && operationTextValue !== "="),
+        pressMathOperationWithNoSecondValue = (hasZeroLen(state.res)
+            && !hasZeroLen(state.firstVal) &&
+            operationTextValue !== "="),
+        pressEqualWithSecondValue = (!hasZeroLen(state.res)
+            && !hasZeroLen(state.firstVal) &&
+            operationTextValue === "=");
+
+    if (pressMathOperationWithNoFirstValue) {
         setState({ res: "", firstVal: state.res, operation: operationTextValue });
         return;
     }
-    if (pressedEqual) {
+    if (pressEqualWithNoSecondValue) {
+        return;
+    }
+    if (pressMathOperationWithNoSecondValue) {
+        console.log(2);
+        setState({ operation: operationTextValue });
+        return;
+    }
+    if (pressEqualWithSecondValue) {
+        console.log(3);
         setState({ secondVal: state.res });
         solveTheEquation();
         return;
     }
+
+    console.log(4);
     setState({ secondVal: state.res });
     solveTheEquation();
-    setState({ res: "", operation: operationTextValue });
+    setState({ res: "", firstVal: state.res, operation: operationTextValue });
 }
 
 const operationClicked = (targeted) => {
-    let preventOperationBeforeEnterAnyValue = hasZeroLen(state.res) && hasZeroLen(state.firstVal) && targeted.dataset.value !== "CA";
+    let preventOperationBeforeEnterAnyValue = (hasZeroLen(state.res) &&
+        hasZeroLen(state.firstVal) &&
+        targeted.dataset.value !== "CA");
+
     if (preventOperationBeforeEnterAnyValue) {
         return;
     }
     let operationTextValue = targeted.dataset.value;
     switch (operationTextValue) {
         case "CA":
-            resetState(initialState);
+            resetState();
             break;
         case "C":
             resetInput();
