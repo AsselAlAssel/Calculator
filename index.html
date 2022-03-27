@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="icon.png" type="image/png">
+    <script src="https://kit.fontawesome.com/4a939aa882.js" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="container__shows-container">
+            <div class="container__theme-btns-container">
+                <button class="btn sun btn--sun"><i class="fas fa-sun"></i></button>
+                <button class="btn moon btn--moon"><i class="fas fa-moon"></i></button>
+
+            </div>
+            <div class="container__show-equation" value="0">
+                0
+            </div>
+            <div class="container__show-result">
+                0
+            </div>
+        </div>
+        <div class="container__btns-container">
+
+            <button class="btn operation clean-all" data-value="CA" data-type="operation">CA</button>
+            <button class="btn operation clean" data-value="C" data-type="operation">C</button>
+            <button class="btn operation clean-step" data-value="delete-step" data-type="operation">&larr;</button>
+            <button class="btn operation" data-value="*" data-type="operation">*</button>
+            <button class="btn number" data-value="7" data-type="number">7</button>
+            <button class="btn number" data-value="8" data-type="number">8</button>
+            <button class="btn number" data-value="9" data-type="number">9</button>
+            <button class="btn operation" data-value="/" data-type="operation">/</button>
+            <button class="btn number" data-value="4" data-type="number">4</button>
+            <button class="btn number" data-value="5" data-type="number">5</button>
+            <button class="btn number" data-value="6" data-type="number">6</button>
+            <button class="btn operation" data-value="+" data-type="operation">+</button>
+            <button class="btn number" data-value="1" data-type="number">1</button>
+            <button class="btn number" data-value="2" data-type="number">2</button>
+            <button class="btn number" data-value="3" data-type="number">3</button>
+            <button class="btn operation" data-value="-" data-type="operation">-</button>
+            <button class="btn operation" data-value="+/-" data-type="operation">+/-</button>
+            <button class="btn number" data-value="0" data-type="number">0</button>
+            <button class="btn number" data-value="." data-type="number">.</button>
+            <button class="btn operation" data-value="=" data-type="operation">=</button>
+
+            <script src="index.js"></script>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
